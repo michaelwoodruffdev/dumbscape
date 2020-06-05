@@ -10,6 +10,7 @@ public class PlayerScript : MonoBehaviour
     float playerSpeed;
     Animation walkAnimation;
     public Vector3 tileLocation;
+    public Terrain terrain;
 
     void Start()
     {
@@ -18,7 +19,6 @@ public class PlayerScript : MonoBehaviour
         this.walkAnimation = this.GetComponent<Animation>();
         this.vertexPath = new Stack<Tilemap.Vertex>();
         this.tileLocation = new Vector3(Mathf.Floor(this.transform.position.x), Mathf.Floor(this.transform.position.y), Mathf.Floor(this.transform.position.z));
-
     }
 
     // used to compare positioning here (due to float comparison not being exact)
@@ -43,7 +43,7 @@ public class PlayerScript : MonoBehaviour
             return;
         }
         Tilemap.Vertex nextVertex = this.vertexPath.Pop();
-        this.setDestination(new Vector3(nextVertex.x + .5f, 0, nextVertex.z + .5f));
+        this.setDestination(new Vector3(nextVertex.x + .5f, nextVertex.height, nextVertex.z + .5f));
     }
 
     // this will be called for each vertex in the path to follow, one after another
@@ -54,6 +54,9 @@ public class PlayerScript : MonoBehaviour
 
     void Update()
     {
+
+        transform.position = new Vector3(transform.position.x, this.terrain.SampleHeight(this.transform.position), transform.position.z);
+
         // if there is a tile to move to
         if (this.destinationPosition.HasValue)
         {
@@ -82,6 +85,8 @@ public class PlayerScript : MonoBehaviour
                 deltaPosition.z = 0f;
             }
 
+            
+
             // and actually move player and rotate him towards destination
             this.transform.Translate(deltaPosition * Time.deltaTime, Space.World);
             this.transform.LookAt(this.transform.position + deltaPosition);
@@ -105,7 +110,7 @@ public class PlayerScript : MonoBehaviour
                 else
                 {
                     Tilemap.Vertex nextVertex = this.vertexPath.Pop();
-                    this.setDestination(new Vector3(nextVertex.x + .5f, 0, nextVertex.z + .5f));
+                    this.setDestination(new Vector3(nextVertex.x + .5f, nextVertex.height, nextVertex.z + .5f));
                 }
             }
         }

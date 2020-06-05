@@ -9,6 +9,7 @@ public class Tilemap : MonoBehaviour
 
     TileData[,] map;
     bool[,] walkMap;
+    float[,] heightMap;
 
     GameObject player;
     public int pathLimit;
@@ -33,8 +34,8 @@ public class Tilemap : MonoBehaviour
 
     void Start()
     {
-        width = 20;
-        height = 20;
+        width = 32;
+        height = 32;
         player = GameObject.Find("Player");
         this.pathLimit = 45;
         map = new TileData[width, height];
@@ -48,9 +49,14 @@ public class Tilemap : MonoBehaviour
             }
         }
 
+        Debug.Log("Creating wolrd?");
         this.worldLoader = GetComponent<WorldLoader>();
         worldLoader.intializeWorldData(map, walkMap, width, height);
         worldLoader.loadWorld();
+
+        this.heightMap = GameObject.Find("Terrain").GetComponent<TerrainGenerator>().getHeightMap();
+        Debug.Log(this.heightMap[1, 1]);
+        Debug.Log(this.heightMap.Length);
     }
 
     // Update is called once per frame
@@ -67,7 +73,7 @@ public class Tilemap : MonoBehaviour
                 Transform hitTransform = hit.transform;
 
                 // if a tile was hit
-                if (hitTransform.ToString().Contains("Ground"))
+                if (hitTransform.ToString().Contains("Terrain"))
                 {
                     Stack<Vertex> vertexPath = findPath(this.player.transform.position, hit.point);
                     this.player.GetComponent<PlayerScript>().setVertexPath(vertexPath);
@@ -119,6 +125,7 @@ public class Tilemap : MonoBehaviour
     {
         public int x;
         public int z;
+        public float height;
         public Vertex previous;
         public int distance;
         public bool walkable;
@@ -136,10 +143,11 @@ public class Tilemap : MonoBehaviour
             this.visited = false;
         }
 
-        public Vertex(int _x, int _y, bool _walkable, int _indexI, int _indexJ)
+        public Vertex(int _x, int _z, float _height, bool _walkable, int _indexI, int _indexJ)
         {
             this.x = _x;
-            this.z = _y;
+            this.z = _z;
+            this.height = _height;
             this.previous = null;
             this.distance = -1;
             this.walkable = _walkable;
@@ -170,7 +178,8 @@ public class Tilemap : MonoBehaviour
                 int actualXCoord = startX - (this.pathLimit / 2 - 1) + i;
                 int actualZCoord = startZ - (this.pathLimit / 2 - 1) + j;
                 bool walkable = (actualXCoord >= 0 && actualXCoord < this.width && actualZCoord >= 0 && actualZCoord < this.height) ? this.walkMap[actualXCoord, actualZCoord] : false;
-                vertices[i, j] = new Vertex(actualXCoord, actualZCoord, walkable, i, j);
+                float vertexHeight = (actualXCoord >= 0 && actualXCoord < this.width && actualZCoord >= 0 && actualZCoord < this.height) ? this.heightMap[actualXCoord, actualZCoord] : 0f;
+                vertices[i, j] = new Vertex(actualXCoord, actualZCoord, vertexHeight, walkable, i, j);
             }
         }
 
@@ -188,7 +197,7 @@ public class Tilemap : MonoBehaviour
             {
                 for (int j = -1; j < 2; j++)
                 {
-                    if ((i == 0 && j == 0) || currentVertex.x + i < 0 || currentVertex.x + i > 19 || currentVertex.z + j < 0 || currentVertex.z + j > 19)
+                    if ((i == 0 && j == 0) || currentVertex.x + i < 0 || currentVertex.x + i >= width || currentVertex.z + j < 0 || currentVertex.z + j >= height)
                     {
                         continue;
                     }
