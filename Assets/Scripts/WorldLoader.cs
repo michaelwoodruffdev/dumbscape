@@ -13,6 +13,9 @@ public class WorldLoader : MonoBehaviour
     // World Objects
     public GameObject treePrefab;
     public GameObject rockPrefab;
+    public GameObject firecapiaStatuePrefab;
+    public GameObject castleWall;
+    public GameObject castleWallCorner;
 
     public WorldLoader(TileData[,] tileMap, bool[,] walkMap, int width, int height)
     {
@@ -29,7 +32,6 @@ public class WorldLoader : MonoBehaviour
         this.width = width;
         this.height = height;
         this.heightMap = GameObject.Find("Terrain").GetComponent<TerrainGenerator>().getHeightMap();
-        Debug.Log(this.treePrefab.ToString());
     }
 
     void addRock(int x, int z, int rotation)
@@ -44,54 +46,70 @@ public class WorldLoader : MonoBehaviour
         this.walkMap[x, z] = false;
     }
 
+    void addFirecapeStatue(int x, int z, int rotation)
+    {
+        this.tileMap[x, z] = new TileData(false, "firecapestatue", rotation);
+        this.walkMap[x, z] = false;
+        for (int i = -2; i < 4; i++)
+        {
+            for (int j = -1; j < 2; j++)
+            {
+                this.walkMap[x + i, z + j] = false;
+            }
+        }
+    }
+
+    void addCastleWall(int x, int z, int rotation)
+    {
+        this.tileMap[x, z] = new TileData(false, "castlewall", rotation);
+        this.walkMap[x, z] = false;
+    }
+
+    void addCastleWallCorner(int x, int z, int rotation)
+    {
+        this.tileMap[x, z] = new TileData(false, "castlewallcorner", rotation);
+        this.walkMap[x, z] = false;
+    }
+
 
     public void loadWorld()
     {
-        addRock(25, 25, 2);
-        addRock(26, 25, 3);
-        addRock(26, 26, 1);
-        addRock(22, 23, 2);
-        addRock(22, 24, 1);
-        addRock(22, 31, 1);
-        addRock(31, 31, 2);
-        addRock(25, 30, 2);
-        addRock(24, 30, 1);
-        addRock(23, 30, 2);
-        addRock(22, 30, 0);
-        addRock(28, 30, 2);
-        addRock(28, 29, 2);
-        addRock(28, 28, 1);
-        addRock(28, 27, 2);
-        addRock(28, 26, 3);
-
-        for (int i = 23; i < 30; i+=1)
+        addFirecapeStatue(15, 16, 0);
+        for (int i = 6; i < 26; i++)
         {
-            for (int j = 2; j < 18; j+=3)
+            if (i != 15 && i != 16)
             {
-                addTree(i, j, 1);
+                addCastleWall(i, 6, 0);
             }
         }
+        addCastleWallCorner(26, 6, 0);
+        for (int i = 6; i < 26; i++)
+        {
+            //if (i != 15 && i != 16)
+            //{
+                addCastleWall(i, 26, 0);
+            //}
+        }
+        addCastleWallCorner(26, 26, 3);
+        for (int i = 7; i < 26; i++)
+        {
+            //if (i != 15 && i != 16)
+            //{
+                addCastleWall(26, i, 1);
+            //}
+        }
+        addCastleWallCorner(5, 6, 1);
+        for (int i = 7; i < 26; i++)
+        {
+            //if (i != 15 && i != 16)
+            //{
+                addCastleWall(5, i, 3);
+            //}
+        }
+        addCastleWallCorner(5, 26, 2);
 
-        addTree(3, 2, 1);
-        addTree(1, 12, 2);
-        addTree(14, 3, 0);
-        addTree(8, 5, 2);
-        addTree(16, 18, 1);
-        addTree(14, 16, 2);
-        addTree(18, 10, 1);
-        addTree(8, 22, 1);
-        addTree(17, 25, 1);
-
-        addRock(4, 2, 0);
-        addRock(6, 18, 1);
-        addRock(10, 12, 0);
-        addRock(14, 12, 2);
-        addRock(16, 5, 2);
-        addRock(10, 5, 0);
-        addRock(19, 3, 1);
-        addRock(3, 16, 2);
-
-
+        addTree(10, 10, 0);
+        addRock(15, 17, 0);
 
 
         for (int i = 0; i < width; i++)
@@ -101,7 +119,6 @@ public class WorldLoader : MonoBehaviour
                 if (this.tileMap[i, j].tileObject == "tree")
                 {
                     GameObject newTree = Instantiate(treePrefab, new Vector3(i + .5f, heightMap[i,j], j + .5f), Quaternion.Euler(90, 90 * this.tileMap[i, j].rotation, 0));
-                    Debug.Log("here" + heightMap[i, j]);
                     newTree.transform.Translate(0f, 2.2f, 0f, Space.World);
                     newTree.transform.localScale -= new Vector3(.6f, .6f, .6f);
                     this.tileMap[i, j].setGameObject(newTree);
@@ -112,6 +129,23 @@ public class WorldLoader : MonoBehaviour
                     newRock.transform.localScale -= new Vector3(40f, 70f, 40f);
                     newRock.transform.Translate(0f, -.03f, 0f, Space.World);
                     this.tileMap[i, j].setGameObject(newRock);
+                }
+                if (this.tileMap[i, j].tileObject == "firecapestatue")
+                {
+                    GameObject newStatue = Instantiate(firecapiaStatuePrefab, new Vector3(i + .35f, heightMap[i, j], j + .5f), Quaternion.Euler(0, 90 * this.tileMap[i, j].rotation, 0));
+                    this.tileMap[i, j].setGameObject(newStatue);
+                }
+                if (this.tileMap[i, j].tileObject == "castlewall")
+                {
+                    GameObject newWall = Instantiate(castleWall, new Vector3(i + .5f, heightMap[i, j], j + .5f), Quaternion.Euler(-90, 90 * this.tileMap[i, j].rotation, 0));
+                    newWall.transform.localScale -= new Vector3(.5f, .5f, .5f);
+                    this.tileMap[i, j].setGameObject(newWall);
+                }
+                if (this.tileMap[i, j].tileObject == "castlewallcorner")
+                {
+                    GameObject newWallCorner = Instantiate(castleWallCorner, new Vector3(i + .5f, heightMap[i, j], j + .5f), Quaternion.Euler(-90, 90 * this.tileMap[i, j].rotation, 0));
+                    newWallCorner.transform.localScale -= new Vector3(49.5f, 49.5f, 49.5f);
+                    this.tileMap[i, j].setGameObject(newWallCorner);
                 }
             }
         }

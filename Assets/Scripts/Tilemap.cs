@@ -9,9 +9,7 @@ public class Tilemap : MonoBehaviour
 
     TileData[,] map;
     bool[,] walkMap;
-    float[,] heightMap;
 
-    GameObject player;
     public int pathLimit;
 
     WorldLoader worldLoader;
@@ -36,7 +34,6 @@ public class Tilemap : MonoBehaviour
     {
         width = 32;
         height = 32;
-        player = GameObject.Find("Player");
         this.pathLimit = 45;
         map = new TileData[width, height];
         this.walkMap = new bool[width, height];
@@ -49,37 +46,9 @@ public class Tilemap : MonoBehaviour
             }
         }
 
-        Debug.Log("Creating wolrd?");
         this.worldLoader = GetComponent<WorldLoader>();
         worldLoader.intializeWorldData(map, walkMap, width, height);
         worldLoader.loadWorld();
-
-        this.heightMap = GameObject.Find("Terrain").GetComponent<TerrainGenerator>().getHeightMap();
-        Debug.Log(this.heightMap[1, 1]);
-        Debug.Log(this.heightMap.Length);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // check for click
-        if (Input.GetMouseButtonUp(0))
-        {
-            // cast ray to see what was clicked (within a range)
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 100))
-            {
-                Transform hitTransform = hit.transform;
-
-                // if a tile was hit
-                if (hitTransform.ToString().Contains("Terrain"))
-                {
-                    Stack<Vertex> vertexPath = findPath(this.player.transform.position, hit.point);
-                    this.player.GetComponent<PlayerScript>().setVertexPath(vertexPath);
-                }
-            }
-        }
     }
 
     public Stack<Vertex> findPath(Vector3 start, Vector3 destination)
@@ -178,8 +147,7 @@ public class Tilemap : MonoBehaviour
                 int actualXCoord = startX - (this.pathLimit / 2 - 1) + i;
                 int actualZCoord = startZ - (this.pathLimit / 2 - 1) + j;
                 bool walkable = (actualXCoord >= 0 && actualXCoord < this.width && actualZCoord >= 0 && actualZCoord < this.height) ? this.walkMap[actualXCoord, actualZCoord] : false;
-                float vertexHeight = (actualXCoord >= 0 && actualXCoord < this.width && actualZCoord >= 0 && actualZCoord < this.height) ? this.heightMap[actualXCoord, actualZCoord] : 0f;
-                vertices[i, j] = new Vertex(actualXCoord, actualZCoord, vertexHeight, walkable, i, j);
+                vertices[i, j] = new Vertex(actualXCoord, actualZCoord, 0f, walkable, i, j);
             }
         }
 

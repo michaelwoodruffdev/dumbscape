@@ -34,73 +34,33 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
 
-        for (int i = 20; i < width; i++)
+        for (int i = 6; i < 26; i++)
         {
-            for (int j = 20; j < height; j++)
-            {
-                newheights[i, j] = 0f;
-            }
+            newheights[i, 4] = .1f;
         }
-
-        for (int i = 4; i < 10; i++)
+        newheights[27, 5] = .1f;
+        for (int j = 6; j < 26; j++)
         {
-            for (int j = 10; j < 16; j++)
-            {
-                newheights[i, j] = .7f;
-            }
+            newheights[4, j] = .1f;
         }
-
-        for (int i = 15; i < 19; i++)
+        newheights[27, 27] = .3f;
+        for (int i = 6; i < 26; i++)
         {
-            for (int j = 4; j < 10; j++)
-            {
-                newheights[i, j] = .4f;
-            }
+            newheights[i, 28] = .1f;
         }
-
-        for (int i = 1; i < 12; i++)
+        newheights[5, 27] = .3f;
+        for (int j = 6; j < 26; j++)
         {
-            for (int j = 25; j < 32; j++)
-            {
-                newheights[i, j] = .2f;
-            }
+            newheights[28, j] = .1f;
         }
+        newheights[5, 5] = .1f;
 
-        for (int i = 21; i < 31; i++)
+        for (int i = 12; i < 21; i++)
         {
-            for (int j = 1; j < 19; j++)
+            for (int j = 14; j < 20; j++)
             {
-                newheights[i, j] = .65f;
+                newheights[i, j] = .8f;
             }
-        }
-
-        for (int i = 2; i < 20; i++)
-        {
-            for (int j = 2; j < 8; j++)
-            {
-                newheights[i, j] = .6f;
-            }
-        }
-
-        for (int i = 17; i < 20; i++)
-        {
-            for (int j = 19; j < 24; j++)
-            {
-                newheights[i, j] = .7f;
-            }
-        }
-
-        for (int i = 3; i < 14; i++)
-        {
-            for (int j = 21; j < 24; j++)
-            {
-                newheights[i, j] = .45f;
-            }
-        }
-
-        for (int i = 0; i < 19; i++)
-        {
-            newheights[i, 31] = .5f;
         }
 
         return newheights;
